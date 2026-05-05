@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="es-ES">
 <!--
-  Wake Up Procrastinator â€” v2
-  Single-file app Â· No framework Â· No backend Â· localStorage only
-  â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  Wake Up Procrastinator — v2
+  Single-file app · No framework · No backend · localStorage only
+  -----------------------------------------------------------------
   Structure:
-    <head>  â†’ metadata + Google Fonts
-    <style> â†’ CSS (sections: reset, typography, layout, components,
+    <head>  -> metadata + Google Fonts
+    <style> -> CSS (sections: reset, typography, layout, components,
                     states, animations, responsive)
-    <body>  â†’ HTML structure (semantic, no inline logic)
-    <script src="lucide CDN"> â†’ icon library
-    <script> â†’ JS (sections: constants, medals def, state,
+    <body>  -> HTML structure (semantic, no inline logic)
+    <script src="lucide CDN"> -> icon library
+    <script> -> JS (sections: constants, medals def, state,
                     persistence, logic, timer, render, utils,
                     events, init)
 -->
@@ -529,7 +529,7 @@
 <body>
   <div id="root">
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â• HEADER â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- =========== HEADER =========== -->
     <header class="app-header">
       <div class="app-brand">
         <div class="app-brand-icon">
@@ -537,13 +537,13 @@
         </div>
         <span class="app-title">Wake Up Procrastinator</span>
       </div>
-      <span class="app-tagline">Misiones de enfoque Â· Sin excusas</span>
+      <span class="app-tagline">Misiones de enfoque · Sin excusas</span>
     </header>
 
-    <!-- â•â•â•â•â•â•â•â•â•â•â• CONTENT GRID â•â•â•â•â•â•â•â•â•â•â• -->
+    <!-- =========== CONTENT GRID =========== -->
     <div class="app-content">
 
-      <!-- â”€â”€â”€ MAIN COLUMN â”€â”€â”€ -->
+      <!-- --- MAIN COLUMN --- -->
       <main class="main-col">
 
         <!-- Stats Bar -->
@@ -586,7 +586,7 @@
         <div class="panel">
           <div class="panel-header">
             <i data-lucide="target" style="width:13px;height:13px;color:var(--text-3)"></i>
-            <span class="panel-title">Nueva misiÃ³n</span>
+            <span class="panel-title">Nueva misión</span>
           </div>
           <div class="panel-body">
 
@@ -594,14 +594,14 @@
               type="text"
               class="text-input"
               id="mission-input"
-              placeholder="Â¿En quÃ© te vas a enfocar?"
+              placeholder="¿En qué te vas a enfocar?"
               maxlength="50"
               autocomplete="off"
               spellcheck="false"
             >
             <div class="char-counter" id="char-count">0 / 50</div>
 
-            <div class="form-sub-label">DuraciÃ³n</div>
+            <div class="form-sub-label">Duración</div>
             <div class="duration-grid">
               <button type="button" class="dur-btn active" data-duration="10">10 min</button>
               <button type="button" class="dur-btn"        data-duration="15">15 min</button>
@@ -620,7 +620,7 @@
                 step="1"
                 inputmode="numeric"
               >
-              <span class="custom-hint">minutos (1â€“180)</span>
+              <span class="custom-hint">minutos (1–180)</span>
             </div>
 
             <div class="inline-msg" id="inline-msg" role="status" aria-live="polite">
@@ -630,7 +630,7 @@
 
             <button type="button" class="btn-start" id="start-btn">
               <i data-lucide="play" style="width:15px;height:15px;"></i>
-              Empezar misiÃ³n
+              Empezar misión
             </button>
 
           </div>
@@ -651,7 +651,7 @@
           </div>
           <button type="button" class="btn-abandon" id="abandon-btn">
             <i data-lucide="x" style="width:14px;height:14px;"></i>
-            Abandonar misiÃ³n
+            Abandonar misión
           </button>
         </div>
 
@@ -659,7 +659,7 @@
         <div class="completion-panel" id="completion-panel" hidden>
           <button type="button" class="btn-complete" id="complete-btn">
             <i data-lucide="check-circle" style="width:18px;height:18px;"></i>
-            MisiÃ³n completada â€” Â¡Reclamar recompensa!
+            Misión completada — ¡Reclamar recompensa!
           </button>
         </div>
 
@@ -676,7 +676,7 @@
 
       </main>
 
-      <!-- â”€â”€â”€ MEDALS SIDEBAR â”€â”€â”€ -->
+      <!-- --- MEDALS SIDEBAR --- -->
       <aside class="medals-sidebar">
         <div class="medals-head">
           <i data-lucide="award" style="width:13px;height:13px;color:var(--text-3)"></i>
@@ -716,16 +716,16 @@
     var RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS; // ≈ 483.8
 
     var MSG_SUCCESS = [
-      'Â¡MisiÃ³n completada! Eres imparable.',
-      'Â¡Excelente! Cada bloque de enfoque cuenta.',
-      'Â¡Un paso mÃ¡s hacia la grandeza!',
-      'Â¡Lo conseguiste! El hÃ¡bito se construye asÃ­.',
-      'Â¡Consistencia es tu superpoder!',
+      '¡Misión completada! Eres imparable.',
+      '¡Excelente! Cada bloque de enfoque cuenta.',
+      '¡Un paso más hacia la grandeza!',
+      '¡Lo conseguiste! El hábito se construye así.',
+      '¡Consistencia es tu superpoder!',
     ];
 
     var MSG_ABANDON = [
-      'MisiÃ³n abandonada. La constancia marca la diferencia.',
-      'No pasa nada, vuelve cuando estÃ©s listo.',
+      'Misión abandonada. La constancia marca la diferencia.',
+      'No pasa nada, vuelve cuando estés listo.',
     ];
 
     /* ============================================================
@@ -734,19 +734,19 @@
     var MEDALS = [
       {
         id: 'first_step', name: 'Primer paso',
-        desc: 'Completa tu primera misiÃ³n', icon: 'flag',
+        desc: 'Completa tu primera misión', icon: 'flag',
         check:    function(s) { return s.missions.length >= 1; },
         progress: function(s) { return { curr: Math.min(s.missions.length, 1), total: 1 }; },
       },
       {
         id: 'daily_3', name: 'Enfoque inicial',
-        desc: '3 misiones en un mismo dÃ­a', icon: 'zap',
+        desc: '3 misiones en un mismo día', icon: 'zap',
         check:    function(s) { return getMaxMissionsInDay(s) >= 3; },
         progress: function(s) { return { curr: Math.min(getMaxMissionsInDay(s), 3), total: 3 }; },
       },
       {
         id: 'active_5', name: 'Cerebro activo',
-        desc: '5 dÃ­as distintos con actividad', icon: 'activity',
+        desc: '5 días distintos con actividad', icon: 'activity',
         check:    function(s) { return getActiveDays(s) >= 5; },
         progress: function(s) { return { curr: Math.min(getActiveDays(s), 5), total: 5 }; },
       },
@@ -758,7 +758,7 @@
       },
       {
         id: 'hyperfocus', name: 'Hyperfocus',
-        desc: 'Completa una misiÃ³n de 25+ min', icon: 'rocket',
+        desc: 'Completa una misión de 25+ min', icon: 'rocket',
         check:    function(s) { return s.missions.some(function(m) { return m.duration >= 25; }); },
         progress: function(s) {
           var n = s.missions.filter(function(m) { return m.duration >= 25; }).length;
@@ -767,7 +767,7 @@
       },
       {
         id: 'streak_7', name: 'Constancia',
-        desc: '7 dÃ­as seguidos con actividad', icon: 'calendar',
+        desc: '7 días seguidos con actividad', icon: 'calendar',
         check:    function(s) { return calcStreak(s) >= 7; },
         progress: function(s) { return { curr: Math.min(calcStreak(s), 7), total: 7 }; },
       },
@@ -841,7 +841,7 @@
         }, 0);
         state.unlockedMedals = [];
         checkMedals();
-      } catch (e) { console.warn('WUP: localStorage parse error â€”', e.message); }
+      } catch (e) { console.warn('WUP: localStorage parse error —', e.message); }
     }
 
     function saveData() {
@@ -851,7 +851,7 @@
           missions:       state.missions,
           unlockedMedals: state.unlockedMedals,
         }));
-      } catch (e) { console.warn('WUP: localStorage write error â€”', e.message); }
+      } catch (e) { console.warn('WUP: localStorage write error —', e.message); }
     }
 
     /* ============================================================
@@ -956,18 +956,18 @@
       inputEl.value = text;
 
       if (text.length === 0) {
-        showInlineMsg('Escribe en quÃ© te vas a enfocar antes de empezar.');
+        showInlineMsg('Escribe en qué te vas a enfocar antes de empezar.');
         inputEl.focus();
         return;
       }
       if (text.length > MAX_MISSION_LEN) {
-        showInlineMsg('La misiÃ³n no puede superar los ' + MAX_MISSION_LEN + ' caracteres.');
+        showInlineMsg('La misión no puede superar los ' + MAX_MISSION_LEN + ' caracteres.');
         return;
       }
       if (state.selectedDur === 'custom') {
         var cVal = parseInt(document.getElementById('custom-input').value, 10);
         if (isNaN(cVal) || cVal < 1 || cVal > 180) {
-          showInlineMsg('Introduce un nÃºmero entre 1 y 180 minutos.');
+          showInlineMsg('Introduce un número entre 1 y 180 minutos.');
           document.getElementById('custom-input').focus();
           return;
         }
@@ -998,7 +998,7 @@
     }
 
     function abandonMission() {
-      if (!confirm('Â¿Seguro que quieres abandonar esta misiÃ³n?\nPerderÃ¡s el progreso del temporizador.')) return;
+      if (!confirm('¿Seguro que quieres abandonar esta misión?\nPerderás el progreso del temporizador.')) return;
       clearInterval(state.timerInterval);
       state.timerInterval  = null;
       state.currentMission = null;
@@ -1241,7 +1241,7 @@
       if (recent.length === 0) {
         var empty       = document.createElement('li');
         empty.className = 'empty-history';
-        empty.textContent = 'AÃºn no has completado ninguna misiÃ³n. Â¡Empieza ahora!';
+        empty.textContent = 'Aún no has completado ninguna misión. ¡Empieza ahora!';
         list.appendChild(empty);
         return;
       }
@@ -1266,7 +1266,7 @@
 
         var meta       = document.createElement('div');
         meta.className = 'history-meta';
-        meta.textContent = mission.duration + ' min Â· ' + formatDate(mission.timestamp);
+        meta.textContent = mission.duration + ' min · ' + formatDate(mission.timestamp);
 
         info.appendChild(textEl);
         info.appendChild(meta);
