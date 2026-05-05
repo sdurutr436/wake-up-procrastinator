@@ -16,6 +16,8 @@
 -->
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests">
+  <meta name="referrer" content="no-referrer">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Wake Up Procrastinator</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -51,7 +53,7 @@
       /* Typography */
       --font:      'Space Grotesk', system-ui, -apple-system, sans-serif;
       --font-mono: 'SF Mono', ui-monospace, 'Cascadia Code', 'Fira Mono', monospace;
-    
+    }
 
     /* ============================================================
        2. TYPOGRAPHY & BASE
@@ -552,10 +554,10 @@
 
             <div class="form-sub-label">DuraciÃ³n</div>
             <div class="duration-grid">
-              <button class="dur-btn active" data-duration="10">10 min</button>
-              <button class="dur-btn"        data-duration="15">15 min</button>
-              <button class="dur-btn"        data-duration="25">25 min</button>
-              <button class="dur-btn"        data-duration="custom">Otra</button>
+              <button type="button" class="dur-btn active" data-duration="10">10 min</button>
+              <button type="button" class="dur-btn"        data-duration="15">15 min</button>
+              <button type="button" class="dur-btn"        data-duration="25">25 min</button>
+              <button type="button" class="dur-btn"        data-duration="custom">Otra</button>
             </div>
 
             <div class="custom-row" id="custom-row">
@@ -566,6 +568,8 @@
                 placeholder="30"
                 min="1"
                 max="180"
+                step="1"
+                inputmode="numeric"
               >
               <span class="custom-hint">minutos (1â€“180)</span>
             </div>
@@ -575,7 +579,7 @@
               <span id="inline-msg-text"></span>
             </div>
 
-            <button class="btn-start" id="start-btn">
+            <button type="button" class="btn-start" id="start-btn">
               <i data-lucide="play" style="width:15px;height:15px;"></i>
               Empezar misiÃ³n
             </button>
@@ -596,7 +600,7 @@
               <div class="timer-sub">restantes</div>
             </div>
           </div>
-          <button class="btn-abandon" id="abandon-btn">
+          <button type="button" class="btn-abandon" id="abandon-btn">
             <i data-lucide="x" style="width:14px;height:14px;"></i>
             Abandonar misiÃ³n
           </button>
@@ -604,7 +608,7 @@
 
         <!-- Completion Panel (hidden by default) -->
         <div class="completion-panel" id="completion-panel" hidden>
-          <button class="btn-complete" id="complete-btn">
+          <button type="button" class="btn-complete" id="complete-btn">
             <i data-lucide="check-circle" style="width:18px;height:18px;"></i>
             MisiÃ³n completada â€” Â¡Reclamar recompensa!
           </button>
@@ -642,7 +646,7 @@
   <div class="toast-wrap" id="toast-wrap"></div>
 
   <!-- Lucide Icons - UMD bundle, all icons included -->
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="./vendor/lucide.min.js"></script>
 
   <script>
     /* ============================================================
@@ -733,6 +737,35 @@
       customDurValue: 30,
     };
 
+    function clampInt(value, min, max, fallback) {
+      var n = typeof value === 'number' ? value : parseInt(value, 10);
+      if (!Number.isFinite(n)) return fallback;
+      n = Math.floor(n);
+      if (n < min || n > max) return fallback;
+      return n;
+    }
+
+    function sanitizeMissionText(raw) {
+      if (typeof raw !== 'string') return '';
+      return raw
+        .replace(/[\u0000-\u001F\u007F-\u009F]/g, ' ')
+        .replace(/[<>]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .slice(0, MAX_MISSION_LEN);
+    }
+
+    function sanitizeMissionRecord(mission) {
+      if (!mission || typeof mission !== 'object') return null;
+
+      var text = sanitizeMissionText(mission.text);
+      var duration = clampInt(mission.duration, 1, 180, null);
+      var timestamp = clampInt(mission.timestamp, 0, 4102444800000, null);
+
+      if (!text || duration === null || timestamp === null) return null;
+      return { text: text, duration: duration, timestamp: timestamp };
+    }
+
     /* ============================================================
        PERSISTENCE
     ============================================================ */
@@ -741,19 +774,17 @@
         var raw = localStorage.getItem(STORAGE_KEY);
         if (!raw) return;
         var p = JSON.parse(raw);
-        if (typeof p.xp === 'number' && Array.isArray(p.missions)) {
-          state.xp = p.xp;
-          state.missions = p.missions.filter(function(m) {
-            return typeof m.text === 'string' &&
-                   typeof m.duration === 'number' &&
-                   typeof m.timestamp === 'number';
-          });
+        if (Array.isArray(p.missions)) {
+          state.missions = p.missions
+            .map(sanitizeMissionRecord)
+            .filter(function(m) { return m !== null; })
+            .slice(0, 500);
         }
-        if (Array.isArray(p.unlockedMedals)) {
-          state.unlockedMedals = p.unlockedMedals.filter(function(id) {
-            return typeof id === 'string';
-          });
-        }
+        state.xp = state.missions.reduce(function(total, mission) {
+          return total + mission.duration;
+        }, 0);
+        state.unlockedMedals = [];
+        checkMedals();
       } catch (e) { console.warn('WUP: localStorage parse error â€”', e.message); }
     }
 
@@ -835,7 +866,8 @@
     ============================================================ */
     function startMission() {
       var inputEl = document.getElementById('mission-input');
-      var text    = inputEl.value.trim();
+      var text    = sanitizeMissionText(inputEl.value);
+      inputEl.value = text;
 
       if (text.length === 0) {
         showInlineMsg('Escribe en quÃ© te vas a enfocar antes de empezar.');
@@ -891,7 +923,7 @@
 
     function completeMission() {
       if (!state.currentMission) return;
-      var text     = state.currentMission.text;
+      var text     = sanitizeMissionText(state.currentMission.text);
       var duration = state.currentMission.duration;
 
       state.missions.unshift({ text: text, duration: duration, timestamp: Date.now() });
@@ -1216,6 +1248,8 @@
       });
 
       document.getElementById('mission-input').addEventListener('input', function() {
+        var safeValue = sanitizeMissionText(this.value);
+        if (this.value !== safeValue) this.value = safeValue;
         updateCharCount(this.value);
         hideInlineMsg();
       });
@@ -1241,6 +1275,10 @@
 
       document.getElementById('custom-input').addEventListener('input', function() {
         var val = parseInt(this.value, 10);
+        if (this.value && /[^\d]/.test(this.value)) {
+          this.value = this.value.replace(/[^\d]/g, '');
+          val = parseInt(this.value, 10);
+        }
         if (!isNaN(val) && val >= 1 && val <= 180) {
           state.customDurValue = val;
           hideInlineMsg();
