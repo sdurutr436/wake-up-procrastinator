@@ -1,0 +1,646 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;700&display=swap');
+
+/* ============================================================
+   1. RESET & CSS VARIABLES
+============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* ── Design tokens (light theme) ── */
+  --background:             oklch(0.9824 0.0013 286.3757);
+  --foreground:             oklch(0.3211 0 0);
+  --card:                   oklch(1 0 0);
+  --card-foreground:        oklch(0.3211 0 0);
+  --primary:                oklch(0.6487 0.1538 150.3071);
+  --primary-foreground:     oklch(1 0 0);
+  --secondary:              oklch(0.6746 0.1414 261.3380);
+  --secondary-foreground:   oklch(1 0 0);
+  --muted:                  oklch(0.8828 0.0285 98.1033);
+  --muted-foreground:       oklch(0.5382 0 0);
+  --accent:                 oklch(0.8269 0.1080 211.9627);
+  --accent-foreground:      oklch(0.3211 0 0);
+  --destructive:            oklch(0.6368 0.2078 25.3313);
+  --destructive-foreground: oklch(1 0 0);
+  --border:                 oklch(0.8699 0 0);
+  --input:                  oklch(0.8699 0 0);
+  --ring:                   oklch(0.6487 0.1538 150.3071);
+  --radius:                 0.5rem;
+
+  /* ── Internal aliases (referenced by all CSS rules below) ── */
+  --bg:             var(--background);
+  --surface:        var(--card);
+  --surface-2:      oklch(0.965 0.003 286);
+  --surface-3:      var(--muted);
+  --primary-light:  oklch(0.72 0.115 150.3071);
+  --primary-dark:   oklch(0.55 0.13  150.3071);
+  --primary-glow:   oklch(0.6487 0.1538 150.3071 / 0.18);
+  --accent-glow:    oklch(0.8269 0.1080 211.9627 / 0.22);
+  --accent-a50:     oklch(0.8269 0.1080 211.9627 / 0.50);
+  --danger:         var(--destructive);
+  --warning:        oklch(0.72 0.16 55);
+  --gold:           oklch(0.72 0.16 55);
+  --text:           var(--foreground);
+  --text-2:         var(--muted-foreground);
+  --text-3:         oklch(0.67 0 0);
+  --border-2:       oklch(0.77 0 0);
+  --r-sm:           calc(var(--radius) - 4px);
+  --r-md:           calc(var(--radius) - 2px);
+  --r-lg:           var(--radius);
+  --font:           'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-mono:      'JetBrains Mono', ui-monospace, monospace;
+
+  /* ── Body gradient ── */
+  --body-gradient:
+    radial-gradient(ellipse 80% 50% at 15% -10%, oklch(0.6487 0.1538 150.3071 / 0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 85% 100%, oklch(0.8269 0.1080 211.9627 / 0.08) 0%, transparent 55%);
+}
+
+/* ── Dark theme ── */
+.dark,
+@media (prefers-color-scheme: dark) { :root:not(.light) {
+  --background:             oklch(0.2303 0.0125 264.2926);
+  --foreground:             oklch(0.9219 0 0);
+  --card:                   oklch(0.3210 0.0078 223.6661);
+  --card-foreground:        oklch(0.9219 0 0);
+  --primary:                oklch(0.6487 0.1538 150.3071);
+  --primary-foreground:     oklch(1 0 0);
+  --secondary:              oklch(0.5880 0.0993 245.7394);
+  --secondary-foreground:   oklch(0.9219 0 0);
+  --muted:                  oklch(0.3867 0 0);
+  --muted-foreground:       oklch(0.7155 0 0);
+  --accent:                 oklch(0.6746 0.1414 261.3380);
+  --accent-foreground:      oklch(0.9219 0 0);
+  --destructive:            oklch(0.6368 0.2078 25.3313);
+  --destructive-foreground: oklch(1 0 0);
+  --border:                 oklch(0.3867 0 0);
+  --input:                  oklch(0.3867 0 0);
+  --ring:                   oklch(0.6487 0.1538 150.3071);
+
+  --surface-2:      oklch(0.27 0.01 264);
+  --primary-light:  oklch(0.78 0.12 150.3071);
+  --primary-glow:   oklch(0.6487 0.1538 150.3071 / 0.22);
+  --accent-glow:    oklch(0.6746 0.1414 261.3380 / 0.22);
+  --accent-a50:     oklch(0.6746 0.1414 261.3380 / 0.50);
+  --text-3:         oklch(0.52 0 0);
+  --border-2:       oklch(0.46 0 0);
+
+  --body-gradient:
+    radial-gradient(ellipse 80% 50% at 15% -10%, oklch(0.6487 0.1538 150.3071 / 0.10) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 85% 100%, oklch(0.6746 0.1414 261.3380 / 0.08) 0%, transparent 55%);
+}}
+
+.dark {
+  --background:             oklch(0.2303 0.0125 264.2926);
+  --foreground:             oklch(0.9219 0 0);
+  --card:                   oklch(0.3210 0.0078 223.6661);
+  --card-foreground:        oklch(0.9219 0 0);
+  --primary:                oklch(0.6487 0.1538 150.3071);
+  --primary-foreground:     oklch(1 0 0);
+  --secondary:              oklch(0.5880 0.0993 245.7394);
+  --secondary-foreground:   oklch(0.9219 0 0);
+  --muted:                  oklch(0.3867 0 0);
+  --muted-foreground:       oklch(0.7155 0 0);
+  --accent:                 oklch(0.6746 0.1414 261.3380);
+  --accent-foreground:      oklch(0.9219 0 0);
+  --destructive:            oklch(0.6368 0.2078 25.3313);
+  --destructive-foreground: oklch(1 0 0);
+  --border:                 oklch(0.3867 0 0);
+  --input:                  oklch(0.3867 0 0);
+  --ring:                   oklch(0.6487 0.1538 150.3071);
+
+  --surface-2:      oklch(0.27 0.01 264);
+  --primary-light:  oklch(0.78 0.12 150.3071);
+  --primary-glow:   oklch(0.6487 0.1538 150.3071 / 0.22);
+  --accent-glow:    oklch(0.6746 0.1414 261.3380 / 0.22);
+  --accent-a50:     oklch(0.6746 0.1414 261.3380 / 0.50);
+  --text-3:         oklch(0.52 0 0);
+  --border-2:       oklch(0.46 0 0);
+
+  --body-gradient:
+    radial-gradient(ellipse 80% 50% at 15% -10%, oklch(0.6487 0.1538 150.3071 / 0.10) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 85% 100%, oklch(0.6746 0.1414 261.3380 / 0.08) 0%, transparent 55%);
+}
+
+/* ============================================================
+   2. TYPOGRAPHY & BASE
+============================================================ */
+html { font-size: 16px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  background-image: var(--body-gradient);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+button { font-family: var(--font); cursor: pointer; }
+input  { font-family: var(--font); }
+
+/* ============================================================
+   3. LAYOUT
+============================================================ */
+#root { min-height: 100vh; display: flex; flex-direction: column; }
+
+.app-content {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 290px;
+  gap: 28px;
+  max-width: 980px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 28px 28px 72px;
+}
+
+/* ============================================================
+   4. HEADER
+============================================================ */
+.app-header {
+  border-bottom: 1px solid var(--border);
+  padding: 16px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.app-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.app-brand-icon {
+  width: 30px; height: 30px;
+  background: var(--primary);
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--primary-foreground); flex-shrink: 0;
+}
+
+.app-title   { font-size: 0.975rem; font-weight: 700; letter-spacing: -0.025em; }
+.app-tagline { font-size: 0.7rem; color: var(--text-3); letter-spacing: 0.07em; text-transform: uppercase; }
+
+/* ============================================================
+   5. MAIN COLUMN
+============================================================ */
+.main-col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+/* ============================================================
+   6. STATS BAR
+============================================================ */
+.stats-bar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background: var(--border);
+  border-radius: var(--r-lg);
+  gap: 1px; overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.stat-cell { background: var(--surface); padding: 16px 14px 14px; }
+
+.stat-cell-top {
+  display: flex; align-items: center;
+  gap: 7px; margin-bottom: 6px;
+}
+
+.stat-icon { color: var(--text-3); display: flex; align-items: center; }
+
+.stat-number {
+  font-size: 1.85rem; font-weight: 700;
+  letter-spacing: -0.04em; line-height: 1;
+  font-variant-numeric: tabular-nums;
+  transition: color 0.3s;
+}
+
+.stat-number.level  { color: var(--primary-light); }
+.stat-number.xp     { color: var(--text); }
+.stat-number.streak { color: var(--accent); }
+
+.stat-label { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.09em; color: var(--text-3); }
+
+/* XP Progress */
+.xp-bar { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 12px 16px; }
+
+.xp-bar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 9px; }
+
+.xp-bar-label { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.09em; color: var(--text-3); }
+
+.xp-bar-value { font-size: 0.7rem; color: var(--text-2); font-variant-numeric: tabular-nums; }
+
+.progress-track { height: 3px; background: var(--surface-3); border-radius: 999px; overflow: hidden; }
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--primary-light));
+  border-radius: 999px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 0;
+}
+
+/* ============================================================
+   7. PANELS
+============================================================ */
+.panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; }
+
+.panel-header { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 7px; }
+
+.panel-title { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3); }
+
+.panel-body { padding: 16px; }
+
+/* ============================================================
+   8. MISSION FORM
+============================================================ */
+.text-input {
+  width: 100%;
+  background: var(--surface-2);
+  border: 1px solid var(--border-2);
+  border-radius: var(--r-sm);
+  padding: 10px 13px;
+  font-size: 0.9rem; color: var(--text);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.text-input:focus   { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+.text-input:disabled { opacity: 0.38; cursor: not-allowed; }
+.text-input::placeholder { color: var(--text-3); }
+
+.char-counter { font-size: 0.65rem; color: var(--text-3); text-align: right; margin-top: 4px; transition: color 0.2s; }
+.char-counter.warn { color: var(--warning); }
+
+.form-sub-label { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.09em; color: var(--text-3); margin: 14px 0 8px; }
+
+/* Duration buttons */
+.duration-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 14px; }
+
+.dur-btn {
+  background: var(--surface-2); border: 1px solid var(--border-2);
+  border-radius: var(--r-sm); padding: 8px 4px;
+  font-size: 0.78rem; font-weight: 600; color: var(--text-2);
+  transition: all 0.15s;
+}
+
+.dur-btn:hover:not(:disabled) { border-color: var(--primary-light); color: var(--text); }
+
+.dur-btn.active {
+  background: color-mix(in oklch, var(--primary) 18%, transparent);
+  border-color: var(--primary);
+  color: var(--primary-light);
+}
+
+.dur-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* Custom time (animated reveal) */
+.custom-row {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 14px;
+  overflow: hidden; max-height: 0; opacity: 0;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+}
+
+.custom-row.visible { max-height: 52px; opacity: 1; }
+
+.custom-input {
+  width: 84px;
+  background: var(--surface-2); border: 1px solid var(--primary);
+  border-radius: var(--r-sm); padding: 8px 10px;
+  font-size: 0.875rem; font-variant-numeric: tabular-nums; color: var(--text);
+  outline: none; transition: box-shadow 0.2s;
+}
+
+.custom-input:focus    { box-shadow: 0 0 0 3px var(--primary-glow); }
+.custom-input:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.custom-hint { font-size: 0.72rem; color: var(--text-3); }
+
+/* Start button */
+.btn-start {
+  width: 100%; background: var(--primary); border: none;
+  border-radius: var(--r-sm); padding: 11px 18px;
+  color: var(--primary-foreground); font-size: 0.875rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  letter-spacing: -0.01em;
+  transition: background 0.18s, transform 0.14s, box-shadow 0.18s;
+}
+
+.btn-start:hover:not(:disabled) {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 22px color-mix(in oklch, var(--primary) 40%, transparent);
+}
+.btn-start:active:not(:disabled) { transform: translateY(0); }
+.btn-start:disabled               { opacity: 0.32; cursor: not-allowed; }
+
+/* Inline error */
+.inline-msg { display: none; align-items: center; gap: 8px; padding: 9px 12px; border-radius: var(--r-sm); font-size: 0.78rem; font-weight: 500; margin-bottom: 12px; }
+.inline-msg.show { display: flex; }
+.inline-msg.warning {
+  background: color-mix(in oklch, var(--destructive) 8%, transparent);
+  border: 1px solid color-mix(in oklch, var(--destructive) 25%, transparent);
+  color: oklch(0.78 0.10 25);
+}
+
+/* ============================================================
+   9. ACTIVE TIMER
+============================================================ */
+.timer-panel {
+  background: var(--surface); border: 1px solid var(--border);
+  border-left: 2px solid var(--accent);
+  border-radius: var(--r-lg); padding: 24px 20px 20px; text-align: center;
+}
+
+.timer-mission-name { font-size: 0.78rem; color: var(--text-2); font-style: italic; margin-bottom: 20px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.ring-container { position: relative; width: 170px; height: 170px; margin: 0 auto 20px; }
+
+.ring-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+
+.ring-track    { fill: none; stroke: var(--surface-3); stroke-width: 3; }
+
+.ring-progress { fill: none; stroke: var(--accent); stroke-width: 3; stroke-linecap: round; transition: stroke-dashoffset 1s linear, stroke 0.4s ease; }
+.ring-progress.mid { stroke: var(--warning); }
+.ring-progress.low { stroke: var(--danger); }
+
+.ring-inner { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; }
+
+.timer-digits { font-family: var(--font-mono); font-size: 3rem; font-weight: 700; letter-spacing: -0.04em; line-height: 1; color: var(--text); font-variant-numeric: tabular-nums; transition: color 0.4s; }
+.timer-sub    { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3); margin-top: 5px; }
+
+.timer-panel.mid .timer-digits { color: var(--warning); }
+.timer-panel.low .timer-digits { color: var(--danger); }
+
+.btn-abandon {
+  width: 100%; background: transparent;
+  border: 1px solid color-mix(in oklch, var(--destructive) 30%, transparent);
+  border-radius: var(--r-sm); padding: 9px;
+  color: var(--danger); font-size: 0.78rem; font-weight: 600;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  transition: background 0.18s, border-color 0.18s;
+}
+
+.btn-abandon:hover {
+  background: color-mix(in oklch, var(--destructive) 10%, transparent);
+  border-color: var(--danger);
+}
+
+/* ============================================================
+   10. COMPLETION
+============================================================ */
+.completion-panel {
+  background: color-mix(in oklch, var(--accent) 5%, transparent);
+  border: 1px solid color-mix(in oklch, var(--accent) 20%, transparent);
+  border-radius: var(--r-lg); padding: 16px;
+}
+
+.btn-complete {
+  width: 100%; background: transparent;
+  border: 1px solid var(--accent);
+  border-radius: var(--r-sm); padding: 13px 18px;
+  color: var(--accent); font-size: 0.9rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  transition: background 0.2s, color 0.2s;
+  animation: pulse-border 2.2s ease-in-out infinite;
+}
+
+.btn-complete:hover { background: var(--accent); color: var(--accent-foreground); animation: none; }
+
+@keyframes pulse-border {
+  0%, 100% { box-shadow: 0 0 0 0 var(--accent-a50); }
+  50%       { box-shadow: 0 0 0 7px transparent; }
+}
+
+/* ============================================================
+   11. HISTORY
+============================================================ */
+.history-list { list-style: none; display: flex; flex-direction: column; gap: 1px; background: var(--border); }
+
+.history-item { background: var(--surface); padding: 11px 16px; display: flex; align-items: center; gap: 11px; transition: background 0.15s; }
+.history-item:hover { background: var(--surface-2); }
+
+.history-dot {
+  width: 26px; height: 26px; border-radius: 6px;
+  background: color-mix(in oklch, var(--primary) 14%, transparent);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--primary-light); flex-shrink: 0;
+}
+
+.history-info { flex: 1; min-width: 0; }
+
+.history-text { font-size: 0.845rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.history-meta { font-size: 0.65rem; color: var(--text-3); margin-top: 2px; }
+
+.history-xp { font-size: 0.72rem; font-weight: 700; color: var(--primary-light); flex-shrink: 0; }
+
+.empty-history { padding: 26px 16px; text-align: center; color: var(--text-3); font-size: 0.82rem; }
+
+/* ============================================================
+   12. MEDALS SIDEBAR
+============================================================ */
+.medals-sidebar {
+  position: sticky; top: 28px; height: fit-content;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r-lg); display: flex; flex-direction: column;
+}
+
+.medals-head { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 7px; }
+
+.medals-title { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3); }
+
+.medals-badge { margin-left: auto; font-size: 0.65rem; font-weight: 600; color: var(--text-3); background: var(--surface-2); padding: 2px 8px; border-radius: 999px; }
+
+.medals-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border-radius: 0 0 var(--r-lg) var(--r-lg); overflow: hidden; }
+
+.medal-item { position: relative; background: var(--surface); padding: 14px 10px; display: flex; flex-direction: column; align-items: center; gap: 7px; transition: background 0.15s; }
+.medal-item:hover { background: var(--surface-2); }
+
+.medal-icon { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: box-shadow 0.3s, background 0.3s; }
+
+.medal-item.locked   .medal-icon { background: var(--surface-3); color: var(--text-3); opacity: 0.55; }
+.medal-item.unlocked .medal-icon {
+  background: color-mix(in oklch, var(--primary) 18%, transparent);
+  color: var(--primary-light);
+  box-shadow: 0 0 14px color-mix(in oklch, var(--primary) 30%, transparent);
+}
+
+.medal-item.unlocked[data-medal="streak_7"] .medal-icon {
+  background: color-mix(in oklch, var(--gold) 15%, transparent);
+  color: var(--gold);
+  box-shadow: 0 0 14px color-mix(in oklch, var(--gold) 25%, transparent);
+}
+.medal-item.unlocked[data-medal="xp_1000"] .medal-icon {
+  background: color-mix(in oklch, var(--accent) 14%, transparent);
+  color: var(--accent);
+  box-shadow: 0 0 14px color-mix(in oklch, var(--accent) 25%, transparent);
+}
+.medal-item.unlocked[data-medal="hyperfocus"] .medal-icon {
+  background: color-mix(in oklch, var(--destructive) 13%, transparent);
+  color: oklch(0.72 0.15 25);
+  box-shadow: 0 0 14px color-mix(in oklch, var(--destructive) 20%, transparent);
+}
+
+.medal-name { font-size: 0.65rem; font-weight: 600; text-align: center; line-height: 1.25; }
+.medal-item.locked   .medal-name { color: var(--text-3); }
+.medal-item.unlocked .medal-name { color: var(--text-2); }
+
+/* Medal tooltip */
+.medal-tip {
+  position: absolute; bottom: calc(100% + 6px); left: 50%;
+  transform: translateX(-50%) translateY(5px);
+  background: var(--surface-3); border: 1px solid var(--border-2);
+  border-radius: var(--r-md); padding: 10px 12px;
+  min-width: 160px; max-width: 200px; z-index: 50;
+  pointer-events: none; opacity: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  box-shadow: 0 8px 28px color-mix(in oklch, oklch(0 0 0) 30%, transparent);
+}
+
+.medal-item:hover .medal-tip { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+.tip-name { font-size: 0.75rem; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+.tip-desc { font-size: 0.67rem; color: var(--text-2); line-height: 1.4; margin-bottom: 8px; }
+
+.tip-progress-track { height: 3px; background: var(--surface-2); border-radius: 999px; overflow: hidden; margin-bottom: 4px; }
+.tip-progress-fill  { height: 100%; border-radius: 999px; background: var(--primary); }
+
+.medal-item.unlocked .tip-progress-fill { background: var(--accent); }
+
+.tip-progress-text { font-size: 0.62rem; color: var(--text-3); }
+
+/* Medal unlock animation */
+@keyframes unlock-pop {
+  0%   { transform: scale(0.4); opacity: 0; }
+  65%  { transform: scale(1.18); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.medal-item.just-unlocked .medal-icon { animation: unlock-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+
+/* ============================================================
+   13. TOASTS
+============================================================ */
+.toast-wrap { position: fixed; top: 18px; right: 18px; z-index: 999; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+
+.toast {
+  background: var(--surface-2); border: 1px solid var(--border-2); border-radius: var(--r-md);
+  padding: 11px 15px; font-size: 0.835rem; font-weight: 500; max-width: 290px;
+  display: flex; align-items: center; gap: 9px;
+  opacity: 0; transform: translateX(16px);
+  transition: opacity 0.28s ease, transform 0.28s ease;
+  pointer-events: auto;
+}
+
+.toast.show { opacity: 1; transform: translateX(0); }
+
+.toast.success {
+  border-color: color-mix(in oklch, var(--accent) 30%, transparent);
+  background: color-mix(in oklch, var(--accent) 8%, transparent);
+}
+.toast.success .t-icon { color: var(--accent); }
+
+.toast.warning {
+  border-color: color-mix(in oklch, var(--destructive) 30%, transparent);
+  background: color-mix(in oklch, var(--destructive) 8%, transparent);
+}
+.toast.warning .t-icon { color: var(--danger); }
+
+.toast.xp {
+  border-color: color-mix(in oklch, var(--primary) 35%, transparent);
+  background: color-mix(in oklch, var(--primary) 12%, transparent);
+}
+.toast.xp .t-icon { color: var(--primary-light); }
+
+/* ============================================================
+   14. ANIMATIONS
+============================================================ */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes number-bump {
+  0%   { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+
+.stat-number.bump { animation: number-bump 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+
+/* ---- Level-up animations ---- */
+@keyframes level-up-glow {
+  0%   { transform: scale(1);    color: var(--primary-light); filter: none; }
+  30%  { transform: scale(1.45); color: var(--primary-foreground); filter: drop-shadow(0 0 14px color-mix(in oklch, var(--primary-light) 95%, transparent)); }
+  65%  { transform: scale(1.2);  color: var(--primary-light); filter: drop-shadow(0 0 6px color-mix(in oklch, var(--primary) 50%, transparent)); }
+  100% { transform: scale(1);    color: var(--primary-light); filter: none; }
+}
+
+.stat-number.level-up-pulse {
+  animation: level-up-glow 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Level-up banner overlay */
+.levelup-banner {
+  position: fixed; top: 50%; left: 50%;
+  transform: translate(-50%, -60%) scale(0.75);
+  background: linear-gradient(140deg,
+    color-mix(in oklch, var(--primary) 97%, transparent) 0%,
+    var(--primary-dark) 100%
+  );
+  border: 1px solid color-mix(in oklch, var(--primary-light) 45%, transparent);
+  border-radius: var(--r-lg);
+  padding: 26px 52px;
+  text-align: center;
+  z-index: 1000;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.32s ease, transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow:
+    0 0 80px color-mix(in oklch, var(--primary) 45%, transparent),
+    0 24px 64px color-mix(in oklch, oklch(0 0 0) 55%, transparent);
+  will-change: transform, opacity;
+}
+
+.levelup-banner.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.levelup-banner-label {
+  font-size: 0.6rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.2em; color: oklch(1 0 0 / 0.5); margin-bottom: 8px;
+}
+
+.levelup-banner-number {
+  font-size: 4rem; font-weight: 700; letter-spacing: -0.06em;
+  color: oklch(1 0 0); line-height: 1; margin-bottom: 6px;
+  font-variant-numeric: tabular-nums;
+}
+
+.levelup-banner-sub {
+  font-size: 0.75rem; color: oklch(1 0 0 / 0.6); font-weight: 500;
+}
+
+.stats-bar, .xp-bar, .panel, .timer-panel, .completion-panel {
+  animation: fade-up 0.3s ease-out both;
+}
+
+/* ============================================================
+   15. RESPONSIVE
+============================================================ */
+@media (max-width: 740px) {
+  .app-content { grid-template-columns: 1fr; padding: 18px 14px 56px; gap: 16px; }
+  .medals-sidebar { position: static; order: 99; }
+  .medals-grid { grid-template-columns: repeat(4, 1fr); }
+  .ring-container { width: 148px; height: 148px; }
+  .timer-digits { font-size: 2.6rem; }
+  .app-header { padding: 12px 14px; }
+  .app-tagline { display: none; }
+}
+
+@media (max-width: 460px) {
+  .medals-grid { grid-template-columns: repeat(3, 1fr); }
+  .duration-grid { grid-template-columns: repeat(2, 1fr); }
+}
