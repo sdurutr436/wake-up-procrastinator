@@ -51,7 +51,7 @@
       /* Typography */
       --font:      'Space Grotesk', system-ui, -apple-system, sans-serif;
       --font-mono: 'SF Mono', ui-monospace, 'Cascadia Code', 'Fira Mono', monospace;
-    
+    }
 
     /* ============================================================
        2. TYPOGRAPHY & BASE
@@ -452,6 +452,55 @@
 
     .stat-number.bump { animation: number-bump 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
 
+    /* ---- Level-up animations ---- */
+    @keyframes level-up-glow {
+      0%   { transform: scale(1);    color: var(--primary-light); filter: none; }
+      30%  { transform: scale(1.45); color: #fff; filter: drop-shadow(0 0 14px rgba(167,139,250,0.95)); }
+      65%  { transform: scale(1.2);  color: var(--primary-light); filter: drop-shadow(0 0 6px rgba(124,58,237,0.5)); }
+      100% { transform: scale(1);    color: var(--primary-light); filter: none; }
+    }
+
+    .stat-number.level-up-pulse {
+      animation: level-up-glow 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    /* Level-up banner overlay */
+    .levelup-banner {
+      position: fixed; top: 50%; left: 50%;
+      transform: translate(-50%, -60%) scale(0.75);
+      background: linear-gradient(140deg, rgba(124,58,237,0.97) 0%, rgba(79,20,180,0.97) 100%);
+      border: 1px solid rgba(167,139,250,0.45);
+      border-radius: var(--r-lg);
+      padding: 26px 52px;
+      text-align: center;
+      z-index: 1000;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.32s ease, transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 0 80px rgba(124,58,237,0.45), 0 24px 64px rgba(0,0,0,0.55);
+      will-change: transform, opacity;
+    }
+
+    .levelup-banner.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .levelup-banner-label {
+      font-size: 0.6rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.2em; color: rgba(255,255,255,0.5); margin-bottom: 8px;
+    }
+
+    .levelup-banner-number {
+      font-size: 4rem; font-weight: 700; letter-spacing: -0.06em;
+      color: #fff; line-height: 1; margin-bottom: 6px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .levelup-banner-sub {
+      font-size: 0.75rem; color: rgba(255,255,255,0.6); font-weight: 500;
+    }
+
     .stats-bar, .xp-bar, .panel, .timer-panel, .completion-panel {
       animation: fade-up 0.3s ease-out both;
     }
@@ -638,6 +687,13 @@
     </div>
   </div>
 
+  <!-- Level-up banner overlay -->
+  <div class="levelup-banner" id="levelup-banner" aria-hidden="true">
+    <div class="levelup-banner-label">Nivel alcanzado</div>
+    <div class="levelup-banner-number" id="levelup-banner-number">2</div>
+    <div class="levelup-banner-sub">\u00a1Sigue as\u00ed!</div>
+  </div>
+
   <!-- Toast container -->
   <div class="toast-wrap" id="toast-wrap"></div>
 
@@ -649,11 +705,11 @@
        CONSTANTS
     ============================================================ */
     var STORAGE_KEY        = 'wup_data_v2';
-    var XP_PER_LEVEL       = 100;
+    var SOUND_ENABLED      = true;       // set false to silence level-up sound
     var MAX_MISSION_LEN    = 50;
     var MAX_HISTORY        = 10;
     var RING_RADIUS        = 77;
-    var RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS; // â‰ˆ 483.8
+    var RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS; // ≈ 483.8
 
     var MSG_SUCCESS = [
       'Â¡MisiÃ³n completada! Eres imparable.',
@@ -770,8 +826,38 @@
     /* ============================================================
        PURE LOGIC
     ============================================================ */
-    function calcLevel(xp) {
-      return { level: Math.floor(xp / XP_PER_LEVEL) + 1, progress: xp % XP_PER_LEVEL };
+    /* --- Level system: mission-count based, exponential threshold ---
+       threshold(N) = 1 + (N-1)*N/2
+       N=1→1, N=2→2, N=3→4, N=4→7, N=5→11, N=6→16 ... */
+    function missionThreshold(level) {
+      if (level <= 1) return 1;
+      return 1 + Math.floor((level - 1) * level / 2);
+    }
+
+    function calculateLevelProgress(missionCount) {
+      var mc    = Math.max(missionCount, 0);
+      var level = 1;
+      while (mc >= missionThreshold(level + 1)) { level++; }
+      var currThreshold = missionThreshold(level);
+      var nextThreshold = missionThreshold(level + 1);
+      var inLevel       = mc - currThreshold;
+      var needed        = nextThreshold - currThreshold;
+      return {
+        level:           level,
+        progressPct:     needed > 0 ? Math.min((inLevel / needed) * 100, 100) : 100,
+        missionsInLevel: Math.max(inLevel, 0),
+        missionsNeeded:  needed,
+        missionsToNext:  Math.max(needed - inLevel, 0),
+      };
+    }
+
+    function detectLevelUp(prevCount, newCount) {
+      if (newCount <= prevCount) return 0;
+      var prevLevel = 1;
+      while (prevCount >= missionThreshold(prevLevel + 1)) { prevLevel++; }
+      var newLevel = prevLevel;
+      while (newCount >= missionThreshold(newLevel + 1)) { newLevel++; }
+      return newLevel > prevLevel ? newLevel : 0;
     }
 
     function calcStreak(s) {
@@ -894,12 +980,18 @@
       var text     = state.currentMission.text;
       var duration = state.currentMission.duration;
 
+      /* Capture pre-completion state for level-up detection */
+      var prevMissionCount = state.missions.length;
+      var prevProg         = calculateLevelProgress(prevMissionCount);
+
       state.missions.unshift({ text: text, duration: duration, timestamp: Date.now() });
       state.xp += duration;
       state.currentMission = null;
       state.timeLeft       = 0;
 
-      var newMedals = checkMedals();
+      var newMissionCount = state.missions.length;
+      var levelUp         = detectLevelUp(prevMissionCount, newMissionCount);
+      var newMedals       = checkMedals();
       saveData();
 
       showToast(MSG_SUCCESS[Math.floor(Math.random() * MSG_SUCCESS.length)], 'success');
@@ -910,6 +1002,21 @@
       updateCharCount('');
 
       renderUI();
+
+      /* Level-up sequence: reset bar to pre-completion pct, then animate */
+      if (levelUp) {
+        requestAnimationFrame(function() {
+          var fill = document.getElementById('progress-fill');
+          if (fill) {
+            fill.style.transition = 'none';
+            fill.style.width = prevProg.progressPct + '%';
+          }
+          setTimeout(function() {
+            playLevelUpAnimation(levelUp);
+            playLevelUpSound();
+          }, 80);
+        });
+      }
 
       /* Animate newly unlocked medals after render */
       if (newMedals.length > 0) {
@@ -922,7 +1029,7 @@
             }
           });
           var def = MEDALS.filter(function(m) { return m.id === newMedals[0]; })[0];
-          if (def) showToast('Â¡Logro desbloqueado: ' + def.name + '!', 'success');
+          if (def) showToast('\u00a1Logro desbloqueado: ' + def.name + '!', 'success');
         }, 350);
       }
     }
@@ -931,18 +1038,17 @@
        RENDER FUNCTIONS
     ============================================================ */
     function renderUI() {
-      var lvl    = calcLevel(state.xp);
+      var prog   = calculateLevelProgress(state.missions.length);
       var streak = calcStreak();
       var active  = state.currentMission !== null;
       var running = active && state.timeLeft > 0;
       var done    = active && state.timeLeft <= 0;
 
       /* Stats */
-      setTextBumped('stat-level',  lvl.level);
+      setTextBumped('stat-level',  prog.level);
       setTextBumped('stat-xp',     state.xp);
       setTextBumped('stat-streak', streak);
-      document.getElementById('progress-fill').style.width = lvl.progress + '%';
-      document.getElementById('xp-bar-value').textContent  = lvl.progress + ' / 100 XP';
+      renderXPBar(prog);
 
       /* Form lock state */
       var disabled = active;
@@ -992,6 +1098,106 @@
       ringEl.classList.toggle('mid', pct >= 0.15 && pct < 0.35);
       panel.classList.toggle('low', pct < 0.15);
       panel.classList.toggle('mid', pct >= 0.15 && pct < 0.35);
+    }
+
+    /* --- renderXPBar: updates progress bar and label (CSS transition handles easing) --- */
+    function renderXPBar(prog) {
+      var fill  = document.getElementById('progress-fill');
+      var label = document.getElementById('xp-bar-value');
+      if (!fill || !label) return;
+      fill.style.width = prog.progressPct + '%';
+      label.textContent =
+        prog.missionsInLevel + ' / ' + prog.missionsNeeded +
+        ' misiones \u00b7 Nv.' + (prog.level + 1);
+    }
+
+    /* --- animateXPChange: JS-driven eased animation (used during level-up sequence) --- */
+    function animateXPChange(fill, fromPct, toPct) {
+      var startTime = null;
+      var duration  = 550;
+      function easeInOut(t) { return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t; }
+      function step(ts) {
+        if (!startTime) startTime = ts;
+        var t = Math.min((ts - startTime) / duration, 1);
+        fill.style.width = (fromPct + (toPct - fromPct) * easeInOut(t)) + '%';
+        if (t < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+
+    /* --- playLevelUpAnimation: visual sequence on level-up --- */
+    function playLevelUpAnimation(level) {
+      /* 1. Pulse the level stat number */
+      var levelEl = document.getElementById('stat-level');
+      if (levelEl) {
+        levelEl.classList.remove('level-up-pulse');
+        void levelEl.offsetWidth; /* force reflow to restart animation */
+        levelEl.classList.add('level-up-pulse');
+        setTimeout(function() { levelEl.classList.remove('level-up-pulse'); }, 950);
+      }
+
+      /* 2. XP bar: animate fill → 100%, reset to 0, then animate to new progress */
+      var fill = document.getElementById('progress-fill');
+      if (fill) {
+        var fromPct = parseFloat(fill.style.width) || 0;
+        fill.style.transition = ''; /* re-enable if was disabled */
+        animateXPChange(fill, fromPct, 100);
+        setTimeout(function() {
+          fill.style.transition = 'none';
+          fill.style.width = '0%';
+          requestAnimationFrame(function() {
+            requestAnimationFrame(function() {
+              fill.style.transition = '';
+              var newProg = calculateLevelProgress(state.missions.length);
+              animateXPChange(fill, 0, newProg.progressPct);
+              var label = document.getElementById('xp-bar-value');
+              if (label) {
+                label.textContent =
+                  newProg.missionsInLevel + ' / ' + newProg.missionsNeeded +
+                  ' misiones \u00b7 Nv.' + (newProg.level + 1);
+              }
+            });
+          });
+        }, 620);
+      }
+
+      /* 3. Show banner overlay */
+      var banner = document.getElementById('levelup-banner');
+      if (banner) {
+        var numEl = document.getElementById('levelup-banner-number');
+        if (numEl) numEl.textContent = String(level);
+        banner.classList.add('show');
+        setTimeout(function() { banner.classList.remove('show'); }, 2400);
+      }
+
+      showToast('\u00a1Nivel ' + level + ' alcanzado!', 'xp');
+    }
+
+    /* --- playLevelUpSound: ascending arpeggio via Web Audio API --- */
+    function playLevelUpSound() {
+      if (!SOUND_ENABLED) return;
+      try {
+        var AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        var ctx   = new AudioCtx();
+        /* C5 - E5 - G5 - C6 major arpeggio */
+        var notes = [523.25, 659.25, 783.99, 1046.5];
+        notes.forEach(function(freq, i) {
+          var osc  = ctx.createOscillator();
+          var gain = ctx.createGain();
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.type = 'sine';
+          osc.frequency.value = freq;
+          var t = ctx.currentTime + i * 0.13;
+          gain.gain.setValueAtTime(0, t);
+          gain.gain.linearRampToValueAtTime(0.22, t + 0.04);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.46);
+          osc.start(t);
+          osc.stop(t + 0.5);
+        });
+        setTimeout(function() { try { ctx.close(); } catch (e) {} }, 2500);
+      } catch (e) { /* Web Audio not available or blocked by browser */ }
     }
 
     function renderHistory() {
